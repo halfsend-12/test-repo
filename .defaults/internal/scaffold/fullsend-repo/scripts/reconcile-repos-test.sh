@@ -36,13 +36,6 @@ cat > "${CONFIG_DIR}/templates/shim-workflow-call.yaml" <<'EOF'
 fresh shim template
 EOF
 
-mkdir -p "${CONFIG_DIR}/.github/scripts"
-cat > "${CONFIG_DIR}/.github/scripts/stop-agent.sh" <<'EOF'
-#!/usr/bin/env bash
-echo "stop-agent stub"
-EOF
-chmod +x "${CONFIG_DIR}/.github/scripts/stop-agent.sh"
-
 cat > "${MOCK_BIN}/base64" <<'EOF'
 #!/usr/bin/env bash
 if [[ "${1:-}" == "-w0" ]]; then
@@ -150,11 +143,7 @@ if [[ "\$has_input" == "true" ]]; then
     printf '%s\0' "\$input_data" >> "${COMMIT_MSGS_LOG}"
   elif [[ "\$endpoint" == *"/git/blobs" ]]; then
     blob_repo=\$(printf '%s' "\$endpoint" | cut -d/ -f3)
-    # Shim blob is created first; keep it (stop-agent script blob is second).
-    blob_file="${TMPDIR}/blob-input-\${blob_repo}.json"
-    if [[ ! -f "\$blob_file" ]]; then
-      printf '%s' "\$input_data" > "\$blob_file"
-    fi
+    printf '%s' "\$input_data" > "${TMPDIR}/blob-input-\${blob_repo}.json"
   fi
 fi
 
@@ -512,12 +501,7 @@ while [[ \$# -gt 0 ]]; do
 done
 
 if [[ "\$has_input" == "true" && "\$endpoint" == *"/git/blobs" ]]; then
-  # Shim blob is created first; keep it (stop-agent script blob is second).
-  if [[ ! -f "${TMPDIR}/blob-input-test-repo.json" ]]; then
-    cat > "${TMPDIR}/blob-input-test-repo.json"
-  else
-    cat >/dev/null
-  fi
+  cat > "${TMPDIR}/blob-input-test-repo.json"
 fi
 
 json=""
@@ -660,12 +644,7 @@ while [[ \$# -gt 0 ]]; do
 done
 
 if [[ "\$has_input" == "true" && "\$endpoint" == *"/git/blobs" ]]; then
-  # Shim blob is created first; keep it (stop-agent script blob is second).
-  if [[ ! -f "${TMPDIR}/blob-input-test-repo.json" ]]; then
-    cat > "${TMPDIR}/blob-input-test-repo.json"
-  else
-    cat >/dev/null
-  fi
+  cat > "${TMPDIR}/blob-input-test-repo.json"
 fi
 
 json=""
